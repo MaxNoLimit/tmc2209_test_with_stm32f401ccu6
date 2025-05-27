@@ -6,7 +6,7 @@
 
 #include <Arduino.h>
 
-#define STALL_VALUE 100     // [0..255]
+#define STALL_VALUE 20      // [0..255]
 #define DRIVER_ADDRESS 0b00 // TMC2209 Driver address according to MS1 and MS2
 #define MY_TMC_USART_PORT Serial1
 

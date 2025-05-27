@@ -17,20 +17,19 @@ void TMC2209_Init()
     driver.toff(4);
     driver.blank_time(24);
     driver.rms_current(1000); // mA
-    driver.microsteps(2);
+    driver.microsteps(16);
     driver.TCOOLTHRS(0xFFFFF); // 20bit max
     driver.semin(5);
 
     driver.semax(2);
     driver.sedn(0b01);
     driver.SGTHRS(STALL_VALUE);
-
-    attachInterrupt(DIAG_PIN, TMC2209_Diag_Handler, RISING);
 }
 
 void TMC2209_Spin_Steps(int steps)
 {
     // enable driver to spin
+    driver.microsteps(16);
     digitalWrite(EN_PIN, LOW);
 
     for (int i = 0; i < steps; i++)
@@ -39,6 +38,7 @@ void TMC2209_Spin_Steps(int steps)
         delayMicroseconds(200);
         digitalWrite(STEP_PIN, LOW);
         delayMicroseconds(200);
+        // Serial2.printf("SG_RESULT: %d\n", driver.SG_RESULT());
     }
 
     // disable driver to spin
@@ -48,6 +48,8 @@ void TMC2209_Spin_Steps(int steps)
 void TMC2209_Homing()
 {
     Serial2.println(F("Homing action..."));
+    driver.microsteps(16);
+
     // enable driver to spin
     digitalWrite(EN_PIN, LOW);
 
@@ -56,20 +58,24 @@ void TMC2209_Homing()
     while (isStallDetected != true)
     {
         digitalWrite(STEP_PIN, HIGH);
-        delayMicroseconds(1000);
+        delayMicroseconds(200);
         digitalWrite(STEP_PIN, LOW);
-        delayMicroseconds(1000);
+        delayMicroseconds(200);
+        // Serial2.printf("SG_RESULT: %d\n", driver.SG_RESULT());
     }
 
     // disable driver to spin
     digitalWrite(EN_PIN, HIGH);
     isStallDetected = !isStallDetected;
     Serial2.println(F("Homing action done!!"));
+    digitalWrite(PC13, HIGH);
 }
 
 void TMC2209_Diag_Handler()
 {
     isStallDetected = !isStallDetected;
+    Serial2.println(F("Stall detected!!"));
     digitalWrite(DIR_PIN, LOW);
-    TMC2209_Spin_Steps(1000);
+    digitalWrite(PC13, LOW);
+    TMC2209_Spin_Steps(10);
 }
