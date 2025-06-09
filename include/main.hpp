@@ -7,6 +7,11 @@
 #define DIR_PIN PB5
 #define DIAG_PIN PB6
 
+#define EN2_PIN PA15
+#define STEP2_PIN PA8
+#define DIR2_PIN PA7
+#define DIAG2_PIN PB7
+
 void GPIO_Init();
 
 #endif // MAIN_HPP
