@@ -16,19 +16,59 @@ void setup()
   attachInterrupt(DIAG_PIN, TMC2209_Diag_Handler, RISING);
   attachInterrupt(DIAG2_PIN, TMC2209_Diag_Handler2, RISING);
 
-  TMC2209_Spin_Steps(1000);
-  TMC2209_Homing();
+  // TMC2209_Spin_Steps(1000);
+  // TMC2209_Homing();
 
   // test simple homing
-  TMC2209_Spin_Steps2(1000);
-  TMC2209_Homing2();
+  // TMC2209_Spin_Steps2(1000);
+  // TMC2209_Homing2();
 
   Serial2.println(F("Done!!"));
 }
 
 void loop()
 {
-  // do nothing
+  String t_msg = Serial2.readString();
+  if (t_msg == "homing1")
+  {
+    TMC2209_Homing();
+  }
+  else if (t_msg == "homing2")
+  {
+    TMC2209_Homing2();
+  }
+  else if (t_msg == "move1")
+  {
+    TMC2209_Spin_Steps(1000, LOW);
+  }
+  else if (t_msg == "move2")
+  {
+    TMC2209_Spin_Steps2(1000, HIGH);
+  }
+  else if (t_msg == "VSlotCalibration")
+  {
+    TMC2209_Homing();
+    Serial2.println(F("Wait..."));
+    delay(1000);
+    TMC2209_MeassureDistance();
+    TMC2209_Spin_Steps((getConstant1() * 200.0 / 2.0), HIGH);
+
+    TMC2209_Homing2();
+    Serial2.println(F("Wait..."));
+    delay(1000);
+    TMC2209_MeassureDistance2();
+    TMC2209_Spin_Steps2((getConstant2() * 200.0 / 2.0), LOW);
+  }
+  else if (t_msg == "Measure1")
+  {
+    TMC2209_MeassureDistance();
+    TMC2209_Spin_Steps((getConstant1() * 200.0 / 2.0), HIGH);
+  }
+  else if (t_msg == "Measure2")
+  {
+    TMC2209_MeassureDistance2();
+    TMC2209_Spin_Steps2((getConstant2() * 200.0 / 2.0), LOW);
+  }
 }
 
 void GPIO_Init()
